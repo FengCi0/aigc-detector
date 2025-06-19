@@ -89,25 +89,29 @@ const FeatureTable = ({ features }) => {
 
   // 获取特征评分
   const getFeatureScore = (feature, value) => {
+    // 确保value是数值类型
+    const numValue = typeof value === 'number' ? value : 0.5;
+    
     // 检查特征是否存在于featureInfo中
     if (!featureInfo[feature]) {
       // 对于未知特征，返回默认评分
       return {
-        percent: value * 100,
+        percent: numValue * 100,
         strokeColor: '#1890ff'
       };
     }
     
     // 根据特征AI指标方向确定评分颜色
-    const percent = value * 100;
+    const percent = numValue * 100;
+    const aiIndicator = featureInfo[feature].aiIndicator || 'varies';
     
-    if (featureInfo[feature].aiIndicator === 'high') {
+    if (aiIndicator === 'high') {
       // 高值指向AI
       return {
         percent,
         strokeColor: percent > 70 ? '#f5222d' : percent > 30 ? '#faad14' : '#52c41a'
       };
-    } else if (featureInfo[feature].aiIndicator === 'low') {
+    } else if (aiIndicator === 'low') {
       // 低值指向AI
       return {
         percent,
@@ -148,15 +152,22 @@ const FeatureTable = ({ features }) => {
       key: 'aiIndicator',
       width: 100,
       render: (text) => {
-        if (text === 'high') return <span className="danger-color">较高</span>;
-        if (text === 'low') return <span className="success-color">较低</span>;
+        // 确保text有值
+        const indicator = text || 'varies';
+        if (indicator === 'high') return <span className="danger-color">较高</span>;
+        if (indicator === 'low') return <span className="success-color">较低</span>;
         return <span className="primary-color">不确定</span>;
       }
     }
   ];
 
   // 准备表格数据
-  const data = Object.keys(features).map(key => {
+  const data = Object.keys(features || {}).map(key => {
+    // 确保features对象和key存在
+    if (!features || features[key] === undefined) {
+      return null;
+    }
+    
     // 对于未知特征，提供默认信息
     const featureData = featureInfo[key] || {
       name: key,
@@ -171,7 +182,7 @@ const FeatureTable = ({ features }) => {
       rawScore: features[key],
       aiIndicator: featureData.aiIndicator
     };
-  });
+  }).filter(item => item !== null);
 
   return (
     <Table
