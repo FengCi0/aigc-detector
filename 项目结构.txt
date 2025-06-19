@@ -2,26 +2,44 @@ aigc-detector/
 │
 ├── backend/                # 后端应用
 │   ├── app.py              # 主应用入口
-│   ├── models/            # AI检测模型
-│   │   ├── detector.py    # 检测器实现
-│   │   └── features.py    # 特征提取器
-│   ├── api/               # API接口
-│   │   └── routes.py      # 路由定义
-│   └── utils/             # 工具函数
+│   ├── run.py              # 启动脚本
+│   ├── train_model.py      # 模型训练脚本
+│   ├── models/             # AI检测模型
+│   │   ├── detector.py     # 检测器实现（增强版）
+│   │   └── features.py     # 特征提取器（增强版）
+│   ├── api/                # API接口
+│   │   └── routes.py       # 路由定义
+│   └── utils/              # 工具函数
 │       └── text_processing.py # 文本处理
 │
-├── frontend/              # 前端应用
-│   ├── public/           
-│   └── src/              
-│       ├── components/    # UI组件
-│       ├── pages/         # 页面
-│       └── services/      # API调用服务
+├── frontend/               # 前端应用
+│   ├── package.json        # 前端依赖配置
+│   ├── public/             # 静态资源
+│   │   ├── index.html      # HTML模板
+│   │   └── manifest.json   # Web应用配置
+│   └── src/                # 源代码
+│       ├── App.js          # 主应用组件
+│       ├── App.css         # 主应用样式
+│       ├── index.js        # 入口文件
+│       ├── index.css       # 全局样式
+│       ├── reportWebVitals.js # 性能监控
+│       ├── components/     # UI组件
+│       │   ├── Header.js   # 页头组件
+│       │   ├── Footer.js   # 页脚组件
+│       │   ├── FeatureRadarChart.js # 雷达图组件
+│       │   └── FeatureTable.js # 特征表格组件
+│       ├── pages/          # 页面
+│       │   ├── HomePage.js # 首页
+│       │   └── AboutPage.js # 关于页面
+│       └── services/       # API调用服务
+│           └── api.js      # API请求封装
 │
-├── data/                  # 数据目录
-│   ├── training/          # 训练数据
-│   └── models/            # 模型存储
+├── data/                   # 数据目录
+│   ├── training/           # 训练数据
+│   │   └── example.txt     # 示例训练文本
+│   └── models/             # 模型存储
+│       └── pretrained/     # 预训练模型缓存（自动创建）
 │
-├── notebooks/             # 实验笔记本
-│   └── feature_analysis.ipynb  # 特征分析
-│
-└── requirements.txt       # 依赖项
+├── .gitignore              # Git忽略配置
+├── README.md               # 项目说明文档
+└── requirements.txt        # Python依赖列表
