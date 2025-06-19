@@ -53,20 +53,26 @@ const FeatureRadarChart = ({ features }) => {
   // 从features中筛选出最重要的特征
   const selectedFeatures = {};
   
-  // 先添加优先特征（如果存在）
-  priorityFeatures.forEach(key => {
-    if (features[key] !== undefined) {
-      selectedFeatures[key] = features[key];
-    }
-  });
-  
-  // 如果特征不足8个，添加其他可用特征
-  if (Object.keys(selectedFeatures).length < 8) {
-    Object.keys(features).forEach(key => {
-      if (!selectedFeatures[key] && Object.keys(selectedFeatures).length < 8) {
+  // 确保features是有效对象
+  if (!features || typeof features !== 'object') {
+    // 如果features无效，返回空对象
+    console.warn('无效的特征数据');
+  } else {
+    // 先添加优先特征（如果存在）
+    priorityFeatures.forEach(key => {
+      if (features[key] !== undefined) {
         selectedFeatures[key] = features[key];
       }
     });
+    
+    // 如果特征不足8个，添加其他可用特征
+    if (Object.keys(selectedFeatures).length < 8) {
+      Object.keys(features).forEach(key => {
+        if (!selectedFeatures[key] && Object.keys(selectedFeatures).length < 8) {
+          selectedFeatures[key] = features[key];
+        }
+      });
+    }
   }
 
   // 准备雷达图数据

@@ -173,7 +173,3 @@ Content-Type: application/json
 - 实现更先进的对抗检测方法
 - 添加批量处理能力
 - 支持更多类型的模型
-
-## 许可证
-
-[MIT 许可证](LICENSE) 
