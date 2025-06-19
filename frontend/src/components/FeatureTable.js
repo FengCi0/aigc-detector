@@ -126,6 +126,41 @@ const FeatureTable = ({ features }) => {
     }
   };
 
+  // 根据得分动态确定AI指标
+  const getDynamicAIIndicator = (feature, value) => {
+    if (!featureInfo[feature]) {
+      return 'varies';
+    }
+
+    // 确保值是有效数字
+    const numValue = typeof value === 'number' ? value : 0.5;
+    const percent = numValue * 100;
+    const staticIndicator = featureInfo[feature].aiIndicator;
+
+    if (staticIndicator === 'high') {
+      // 高值指向AI - 更细致的分级
+      if (percent > 85) return 'very_high';
+      if (percent > 70) return 'high';
+      if (percent > 50) return 'medium_high';
+      if (percent > 30) return 'medium_low';
+      return 'low';
+    } else if (staticIndicator === 'low') {
+      // 低值指向AI - 更细致的分级
+      if (percent < 15) return 'very_high';
+      if (percent < 30) return 'high';
+      if (percent < 50) return 'medium_high';
+      if (percent < 70) return 'medium_low';
+      return 'low';
+    } else {
+      // 对于varies类型，根据与中值的偏离程度判断
+      const deviation = Math.abs(numValue - 0.5);
+      if (deviation < 0.1) return 'medium_neutral';
+      if (deviation < 0.2) return 'medium';
+      if (deviation < 0.3) return 'medium_high';
+      return deviation > 0.4 ? 'very_high' : 'high';
+    }
+  };
+
   const columns = [
     {
       title: '特征',
@@ -151,12 +186,29 @@ const FeatureTable = ({ features }) => {
       dataIndex: 'aiIndicator',
       key: 'aiIndicator',
       width: 100,
-      render: (text) => {
-        // 确保text有值
-        const indicator = text || 'varies';
-        if (indicator === 'high') return <span className="danger-color">较高</span>;
-        if (indicator === 'low') return <span className="success-color">较低</span>;
-        return <span className="primary-color">不确定</span>;
+      render: (text, record) => {
+        // 根据得分动态计算AI指标，而不是使用静态预定义值
+        const dynamicIndicator = getDynamicAIIndicator(record.key, record.rawScore);
+        
+        // 更丰富的指标显示
+        switch(dynamicIndicator) {
+          case 'very_high':
+            return <span style={{ color: '#f5222d', fontWeight: 'bold' }}>极高</span>;
+          case 'high':
+            return <span className="danger-color">较高</span>;
+          case 'medium_high':
+            return <span style={{ color: '#fa8c16' }}>中高</span>;
+          case 'medium':
+            return <span className="primary-color">中等</span>;
+          case 'medium_neutral':
+            return <span style={{ color: '#1890ff' }}>中性</span>;
+          case 'medium_low':
+            return <span style={{ color: '#52c41a' }}>中低</span>;
+          case 'low':
+            return <span className="success-color">较低</span>;
+          default:
+            return <span className="primary-color">不确定</span>;
+        }
       }
     }
   ];
