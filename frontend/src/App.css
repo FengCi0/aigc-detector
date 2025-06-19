@@ -1,0 +1,83 @@
+.layout {
+  min-height: 100vh;
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  padding: 0;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.site-content {
+  padding: 50px 0;
+  min-height: calc(100vh - 64px - 70px); /* 减去header和footer高度 */
+}
+
+.site-footer {
+  text-align: center;
+  padding: 24px 50px;
+  background: #f0f2f5;
+}
+
+.logo {
+  float: left;
+  width: 120px;
+  height: 31px;
+  margin: 16px 24px 16px 0;
+  background: rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: bold;
+  border-radius: 4px;
+}
+
+.site-title {
+  font-size: 28px;
+  margin-bottom: 24px;
+  color: #1890ff;
+  text-align: center;
+}
+
+.result-card {
+  margin-top: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.result-title {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.feature-list {
+  margin-top: 16px;
+}
+
+.feature-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.feature-name {
+  color: #666;
+}
+
+.chart-container {
+  height: 300px;
+  margin-top: 24px;
+} 

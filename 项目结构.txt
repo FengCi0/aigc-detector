@@ -1,0 +1,27 @@
+aigc-detector/
+│
+├── backend/                # 后端应用
+│   ├── app.py              # 主应用入口
+│   ├── models/            # AI检测模型
+│   │   ├── detector.py    # 检测器实现
+│   │   └── features.py    # 特征提取器
+│   ├── api/               # API接口
+│   │   └── routes.py      # 路由定义
+│   └── utils/             # 工具函数
+│       └── text_processing.py # 文本处理
+│
+├── frontend/              # 前端应用
+│   ├── public/           
+│   └── src/              
+│       ├── components/    # UI组件
+│       ├── pages/         # 页面
+│       └── services/      # API调用服务
+│
+├── data/                  # 数据目录
+│   ├── training/          # 训练数据
+│   └── models/            # 模型存储
+│
+├── notebooks/             # 实验笔记本
+│   └── feature_analysis.ipynb  # 特征分析
+│
+└── requirements.txt       # 依赖项
