@@ -38,11 +38,66 @@ const FeatureTable = ({ features }) => {
       name: '罕见词比例',
       description: '不常见词汇在文本中的比例，人工撰写通常包含更多罕见词。',
       aiIndicator: 'low' // AI生成内容通常罕见词较少
+    },
+    // 添加高级特征信息
+    readability: {
+      name: '可读性',
+      description: '文本的易读程度，AI生成内容通常可读性较高。',
+      aiIndicator: 'high'
+    },
+    sentence_similarity: {
+      name: '句子相似度',
+      description: '句子间的相似程度，AI生成内容句子间相似性通常较高。',
+      aiIndicator: 'high'
+    },
+    coherence_score: {
+      name: '连贯性',
+      description: '文本的逻辑连贯程度，AI生成内容通常连贯性较高。',
+      aiIndicator: 'high'
+    },
+    style_consistency: {
+      name: '风格一致性',
+      description: '文本风格的一致程度，AI生成内容通常风格一致性较高。',
+      aiIndicator: 'high'
+    },
+    emotion_variation: {
+      name: '情感变化',
+      description: '文本中情感表达的变化程度，人工撰写通常情感变化更自然。',
+      aiIndicator: 'low'
+    },
+    transformers_embedding_1: {
+      name: '语言模型特征1',
+      description: '深度语言模型提取的文本特征。',
+      aiIndicator: 'varies'
+    },
+    transformers_embedding_2: {
+      name: '语言模型特征2',
+      description: '深度语言模型提取的文本特征。',
+      aiIndicator: 'varies'
+    },
+    noun_verb_ratio: {
+      name: '名动词比例',
+      description: '名词与动词的比例，AI生成内容可能有特定比例模式。',
+      aiIndicator: 'varies'
+    },
+    pos_distribution: {
+      name: '词性分布',
+      description: '文本中词性的分布多样性，人工撰写通常词性分布更丰富。',
+      aiIndicator: 'low'
     }
   };
 
   // 获取特征评分
   const getFeatureScore = (feature, value) => {
+    // 检查特征是否存在于featureInfo中
+    if (!featureInfo[feature]) {
+      // 对于未知特征，返回默认评分
+      return {
+        percent: value * 100,
+        strokeColor: '#1890ff'
+      };
+    }
+    
     // 根据特征AI指标方向确定评分颜色
     const percent = value * 100;
     
@@ -101,13 +156,22 @@ const FeatureTable = ({ features }) => {
   ];
 
   // 准备表格数据
-  const data = Object.keys(features).map(key => ({
-    key,
-    feature: featureInfo[key]?.name || key,
-    description: featureInfo[key]?.description || '',
-    rawScore: features[key],
-    aiIndicator: featureInfo[key]?.aiIndicator || 'varies'
-  }));
+  const data = Object.keys(features).map(key => {
+    // 对于未知特征，提供默认信息
+    const featureData = featureInfo[key] || {
+      name: key,
+      description: '额外检测特征',
+      aiIndicator: 'varies'
+    };
+    
+    return {
+      key,
+      feature: featureData.name,
+      description: featureData.description,
+      rawScore: features[key],
+      aiIndicator: featureData.aiIndicator
+    };
+  });
 
   return (
     <Table
