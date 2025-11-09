@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.env
+.venv
+
+# Logs
+*.log
+logs/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+
+# Node.js
+node_modules/
+frontend/node_modules/
+
+# Cache
+*.cache
+.cache/
+
+# Data
+*.sqlite3
+data/
+
+# Others
+*.bak
+*.tmp
