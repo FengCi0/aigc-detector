@@ -2,6 +2,9 @@
 
 中文 AIGC 文本检测项目（发布版），目标是单入口、单数据目录、单生产模型。
 
+[![GitHub stars](https://img.shields.io/github/stars/FengCi0/aigc-detector?style=social)](https://github.com/FengCi0/aigc-detector/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/FengCi0/aigc-detector?style=social)](https://github.com/FengCi0/aigc-detector/network/members)
+
 ## 核心设计
 
 - 单入口：只使用 `python run.py`
@@ -48,6 +51,12 @@ python run.py train-full \
 - `data/models/aigc_detector_model.metadata.json`
 
 说明：当前仓库默认不开启 Transformer 大模型权重（体积较大，不随普通 Git 提交）。
+
+### Transformer 模型说明
+
+- 当前仓库默认提供并内置的是轻量已训练模型（可直接运行）。
+- Transformer 大模型权重文件通常超过 GitHub 单文件限制（100MB），因此不直接放在仓库中。
+- 如需获取作者训练好的 Transformer 权重包或交流部署问题，可联系作者微信：`FengCi_00`
 
 ### 4. 启动服务
 
@@ -97,3 +106,11 @@ curl -X POST http://127.0.0.1:5000/api/detect \
 ```bash
 pytest -q
 ```
+
+## 联系方式
+
+- 微信：`FengCi_00`
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=FengCi0/aigc-detector&type=Date)](https://star-history.com/#FengCi0/aigc-detector&Date)
