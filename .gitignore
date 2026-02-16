@@ -36,6 +36,9 @@ frontend/build/
 data/cache/
 data/models/*
 !data/models/.gitkeep
+!data/models/aigc_detector_model.joblib
+!data/models/aigc_detector_model.metadata.json
+!data/models/runtime_config.json
 data/dataset/*
 !data/dataset/README.md
 !data/dataset/ai/

@@ -1,0 +1,9 @@
+{
+  "generated_at": "2026-02-16T22:10:00+00:00",
+  "source": "release-pretrained-lightweight",
+  "env": {
+    "AIGC_ENABLE_TRANSFORMER": "0",
+    "AIGC_SCORE_THRESHOLD": "0.5"
+  },
+  "notes": "发布版默认启用仓库内置轻量模型（已训练）。Transformer大模型文件较大，默认关闭。"
+}

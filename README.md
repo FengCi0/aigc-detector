@@ -42,6 +42,13 @@ python run.py train-full \
 - `data/models/transformer_detector/`
 - `data/models/runtime_config.json`
 
+发布版仓库已内置一个可直接使用的轻量已训练模型：
+
+- `data/models/aigc_detector_model.joblib`
+- `data/models/aigc_detector_model.metadata.json`
+
+说明：当前仓库默认不开启 Transformer 大模型权重（体积较大，不随普通 Git 提交）。
+
 ### 4. 启动服务
 
 ```bash
