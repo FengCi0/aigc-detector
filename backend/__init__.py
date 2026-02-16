@@ -1,0 +1,1 @@
+"""AIGC detector backend package."""

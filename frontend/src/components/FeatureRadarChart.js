@@ -21,33 +21,33 @@ ChartJS.register(
 );
 
 const FeatureRadarChart = ({ features }) => {
+  const normalizeValue = (value) => {
+    const num = Number(value);
+    if (Number.isNaN(num)) return 0.5;
+    return Math.min(1, Math.max(0, num));
+  };
+
   // 特征展示名称映射
   const featureLabels = {
     // 基础特征
-    entropy: '文本熵值',
-    avg_sentence_length: '句子长度',
+    char_entropy_norm: '字符熵',
+    avg_sentence_length_norm: '平均句长',
+    sentence_length_cv_norm: '句长波动',
     lexical_diversity: '词汇多样性',
-    repetition_score: '重复度',
-    perplexity: '复杂度',
-    function_word_freq: '功能词频率',
-    rare_words_ratio: '罕见词比例',
-    
-    // 高级特征
-    readability: '可读性',
-    sentence_similarity: '句子相似度',
-    coherence_score: '连贯性',
-    style_consistency: '风格一致性',
-    emotion_variation: '情感变化',
-    transformers_embedding_1: '语言模型特征1',
-    transformers_embedding_2: '语言模型特征2',
-    noun_verb_ratio: '名动词比例',
-    pos_distribution: '词性分布'
+    hapax_ratio: '一次词比例',
+    repetition_ratio: '重复比例',
+    bigram_repetition_ratio: '短语重复',
+    function_word_ratio: '功能词比例',
+    punctuation_ratio: '标点比例',
+    long_word_ratio: '长词比例',
+    pos_diversity: '词性多样性',
+    noun_verb_balance: '名动词平衡'
   };
 
   // 选择最重要的特征（最多8个）展示在雷达图上
   const priorityFeatures = [
-    'entropy', 'lexical_diversity', 'repetition_score', 'perplexity',
-    'style_consistency', 'coherence_score', 'sentence_similarity', 'rare_words_ratio'
+    'char_entropy_norm', 'lexical_diversity', 'repetition_ratio', 'bigram_repetition_ratio',
+    'sentence_length_cv_norm', 'function_word_ratio', 'pos_diversity', 'noun_verb_balance'
   ];
   
   // 从features中筛选出最重要的特征
@@ -68,7 +68,7 @@ const FeatureRadarChart = ({ features }) => {
     // 如果特征不足8个，添加其他可用特征
     if (Object.keys(selectedFeatures).length < 8) {
       Object.keys(features).forEach(key => {
-        if (!selectedFeatures[key] && Object.keys(selectedFeatures).length < 8) {
+        if (selectedFeatures[key] === undefined && Object.keys(selectedFeatures).length < 8) {
           selectedFeatures[key] = features[key];
         }
       });
@@ -81,7 +81,7 @@ const FeatureRadarChart = ({ features }) => {
     datasets: [
       {
         label: 'AIGC特征评分',
-        data: Object.values(selectedFeatures).map(val => val * 100), // 转换为百分比
+        data: Object.values(selectedFeatures).map(val => normalizeValue(val) * 100), // 转换为百分比
         backgroundColor: 'rgba(54, 162, 235, 0.2)',
         borderColor: 'rgba(54, 162, 235, 1)',
         borderWidth: 1,

@@ -1,165 +1,187 @@
-import React from 'react';
-import { Table, Progress, Tooltip } from 'antd';
+import React, { useState } from 'react';
+import { Progress, Segmented, Space, Table, Tooltip } from 'antd';
 
 const FeatureTable = ({ features }) => {
-  // 特征名称映射和描述
+  const [scoreView, setScoreView] = useState('risk');
+  const [sortMode, setSortMode] = useState('risk');
+
   const featureInfo = {
-    entropy: {
-      name: '文本熵值',
-      description: '衡量文本信息量和随机性，值较低的文本可能更有规律，更可能是AI生成。',
-      aiIndicator: 'low' // AI生成内容通常熵值较低
+    char_entropy_norm: {
+      name: '字符熵',
+      description: '文本字符分布复杂度。通常更高的熵更接近人工写作。',
+      aiIndicator: 'low'
     },
-    avg_sentence_length: {
-      name: '句子长度',
-      description: 'AI生成的内容通常句子长度更为均匀和适中。',
-      aiIndicator: 'high' // 高值更可能是AI
+    avg_sentence_length_norm: {
+      name: '平均句长',
+      description: '句子平均长度的归一化值。',
+      aiIndicator: 'varies'
+    },
+    sentence_length_cv_norm: {
+      name: '句长波动',
+      description: '句子长度波动系数，越低通常表示更模板化。',
+      aiIndicator: 'low'
     },
     lexical_diversity: {
       name: '词汇多样性',
-      description: '词汇的丰富程度，人工撰写内容通常具有更高的词汇多样性。',
-      aiIndicator: 'low' // AI生成内容通常词汇多样性较低
-    },
-    repetition_score: {
-      name: '重复度',
-      description: '文本中词语和短语的重复程度，AI生成内容通常重复性较高。',
-      aiIndicator: 'high' // 高值更可能是AI
-    },
-    perplexity: {
-      name: '复杂度',
-      description: '文本结构和内容的复杂性，人工撰写通常具有更高的复杂度。',
-      aiIndicator: 'low' // AI生成内容通常复杂度较低
-    },
-    function_word_freq: {
-      name: '功能词频率',
-      description: '常见功能词（如"的"、"是"等）的使用频率，AI生成内容可能有特定模式。',
-      aiIndicator: 'varies' // 视情况而定
-    },
-    rare_words_ratio: {
-      name: '罕见词比例',
-      description: '不常见词汇在文本中的比例，人工撰写通常包含更多罕见词。',
-      aiIndicator: 'low' // AI生成内容通常罕见词较少
-    },
-    // 添加高级特征信息
-    readability: {
-      name: '可读性',
-      description: '文本的易读程度，AI生成内容通常可读性较高。',
-      aiIndicator: 'high'
-    },
-    sentence_similarity: {
-      name: '句子相似度',
-      description: '句子间的相似程度，AI生成内容句子间相似性通常较高。',
-      aiIndicator: 'high'
-    },
-    coherence_score: {
-      name: '连贯性',
-      description: '文本的逻辑连贯程度，AI生成内容通常连贯性较高。',
-      aiIndicator: 'high'
-    },
-    style_consistency: {
-      name: '风格一致性',
-      description: '文本风格的一致程度，AI生成内容通常风格一致性较高。',
-      aiIndicator: 'high'
-    },
-    emotion_variation: {
-      name: '情感变化',
-      description: '文本中情感表达的变化程度，人工撰写通常情感变化更自然。',
+      description: '独特词占比。通常越高越接近人工写作。',
       aiIndicator: 'low'
     },
-    transformers_embedding_1: {
-      name: '语言模型特征1',
-      description: '深度语言模型提取的文本特征。',
-      aiIndicator: 'varies'
-    },
-    transformers_embedding_2: {
-      name: '语言模型特征2',
-      description: '深度语言模型提取的文本特征。',
-      aiIndicator: 'varies'
-    },
-    noun_verb_ratio: {
-      name: '名动词比例',
-      description: '名词与动词的比例，AI生成内容可能有特定比例模式。',
-      aiIndicator: 'varies'
-    },
-    pos_distribution: {
-      name: '词性分布',
-      description: '文本中词性的分布多样性，人工撰写通常词性分布更丰富。',
+    hapax_ratio: {
+      name: '一次词比例',
+      description: '只出现一次的词占比，越高通常信息密度更高。',
       aiIndicator: 'low'
+    },
+    repetition_ratio: {
+      name: '重复比例',
+      description: '词重复程度，越高通常越模板化。',
+      aiIndicator: 'high'
+    },
+    bigram_repetition_ratio: {
+      name: '短语重复',
+      description: '相邻词组重复比例，越高通常越模板化。',
+      aiIndicator: 'high'
+    },
+    function_word_ratio: {
+      name: '功能词比例',
+      description: '常见虚词比例。',
+      aiIndicator: 'varies'
+    },
+    punctuation_ratio: {
+      name: '标点比例',
+      description: '标点在文本中的占比。',
+      aiIndicator: 'varies'
+    },
+    long_word_ratio: {
+      name: '长词比例',
+      description: '长度较长词语占比。',
+      aiIndicator: 'low'
+    },
+    pos_diversity: {
+      name: '词性多样性',
+      description: '词性分布熵，越高通常越接近人工写作。',
+      aiIndicator: 'low'
+    },
+    noun_verb_balance: {
+      name: '名动词平衡',
+      description: '名词与动词的平衡比例。',
+      aiIndicator: 'varies'
     }
   };
 
-  // 获取特征评分
-  const getFeatureScore = (feature, value) => {
-    // 确保value是数值类型
-    const numValue = typeof value === 'number' ? value : 0.5;
-    
-    // 检查特征是否存在于featureInfo中
-    if (!featureInfo[feature]) {
-      // 对于未知特征，返回默认评分
-      return {
-        percent: numValue * 100,
-        strokeColor: '#1890ff'
-      };
-    }
-    
-    // 根据特征AI指标方向确定评分颜色
-    const percent = numValue * 100;
-    const aiIndicator = featureInfo[feature].aiIndicator || 'varies';
-    
-    if (aiIndicator === 'high') {
-      // 高值指向AI
-      return {
-        percent,
-        strokeColor: percent > 70 ? '#f5222d' : percent > 30 ? '#faad14' : '#52c41a'
-      };
-    } else if (aiIndicator === 'low') {
-      // 低值指向AI
-      return {
-        percent,
-        strokeColor: percent < 30 ? '#f5222d' : percent < 70 ? '#faad14' : '#52c41a'
-      };
-    } else {
-      // 中性或不确定
-      return {
-        percent,
-        strokeColor: '#1890ff'
-      };
-    }
+  const normalizeValue = (value) => {
+    const num = Number(value);
+    if (Number.isNaN(num)) return 0.5;
+    return Math.min(1, Math.max(0, num));
   };
 
-  // 根据得分动态确定AI指标
-  const getDynamicAIIndicator = (feature, value) => {
-    if (!featureInfo[feature]) {
-      return 'varies';
+  const getAiRiskMeta = (feature, value) => {
+    const normalized = normalizeValue(value);
+    const aiIndicator = featureInfo[feature]?.aiIndicator || 'varies';
+    const directionHint =
+      aiIndicator === 'high'
+        ? '该特征值越高，通常越偏向AI写作。'
+        : aiIndicator === 'low'
+          ? '该特征值越低，通常越偏向AI写作。'
+          : '该特征受语域影响较大，不单独决定AI风险。';
+
+    if (aiIndicator === 'varies') {
+      return {
+        isReference: true,
+        directionHint
+      };
     }
 
-    // 确保值是有效数字
-    const numValue = typeof value === 'number' ? value : 0.5;
-    const percent = numValue * 100;
-    const staticIndicator = featureInfo[feature].aiIndicator;
+    const riskValue = aiIndicator === 'high' ? normalized : 1 - normalized;
+    const riskPercent = riskValue * 100;
+    const thresholdHint = '阈值：>=75% 高风险，45%-75% 中风险，<45% 低风险。';
 
-    if (staticIndicator === 'high') {
-      // 高值指向AI - 更细致的分级
-      if (percent > 85) return 'very_high';
-      if (percent > 70) return 'high';
-      if (percent > 50) return 'medium_high';
-      if (percent > 30) return 'medium_low';
-      return 'low';
-    } else if (staticIndicator === 'low') {
-      // 低值指向AI - 更细致的分级
-      if (percent < 15) return 'very_high';
-      if (percent < 30) return 'high';
-      if (percent < 50) return 'medium_high';
-      if (percent < 70) return 'medium_low';
-      return 'low';
-    } else {
-      // 对于varies类型，根据与中值的偏离程度判断
-      const deviation = Math.abs(numValue - 0.5);
-      if (deviation < 0.1) return 'medium_neutral';
-      if (deviation < 0.2) return 'medium';
-      if (deviation < 0.3) return 'medium_high';
-      return deviation > 0.4 ? 'very_high' : 'high';
+    if (riskValue >= 0.75) {
+      return {
+        isReference: false,
+        riskPercent,
+        text: 'AI风险高',
+        className: 'danger-color',
+        strokeColor: '#f5222d',
+        directionHint,
+        thresholdHint
+      };
     }
+    if (riskValue >= 0.45) {
+      return {
+        isReference: false,
+        riskPercent,
+        text: 'AI风险中',
+        className: 'warning-color',
+        strokeColor: '#faad14',
+        directionHint,
+        thresholdHint
+      };
+    }
+    return {
+      isReference: false,
+      riskPercent,
+      text: 'AI风险低',
+      className: 'success-color',
+      strokeColor: '#52c41a',
+      directionHint,
+      thresholdHint
+    };
   };
+
+  const renderIndicator = (risk) => {
+    if (risk.isReference) {
+      return (
+        <Tooltip title="该特征不单独决定AI风险，仅作参考">
+          <span className="primary-color">参考（不参与风险阈值）</span>
+        </Tooltip>
+      );
+    }
+
+    return (
+      <Tooltip
+        title={
+          <div>
+            <div>{risk.directionHint}</div>
+            <div>{risk.thresholdHint}</div>
+          </div>
+        }
+      >
+        <span className={risk.className}>
+          {risk.text}（{risk.riskPercent.toFixed(1)}%）
+        </span>
+      </Tooltip>
+    );
+  };
+
+  const dataSource = Object.entries(features || {}).map(([key, value]) => {
+    const info = featureInfo[key] || {
+      name: key,
+      description: '额外特征',
+      aiIndicator: 'varies'
+    };
+    const rawPercent = normalizeValue(value) * 100;
+    const risk = getAiRiskMeta(key, value);
+
+    return {
+      key,
+      feature: info.name,
+      description: info.description,
+      rawScore: value,
+      rawPercent,
+      risk
+    };
+  });
+
+  if (sortMode === 'risk') {
+    dataSource.sort((a, b) => {
+      if (a.risk.isReference && b.risk.isReference) return a.feature.localeCompare(b.feature, 'zh-CN');
+      if (a.risk.isReference) return 1;
+      if (b.risk.isReference) return -1;
+      return b.risk.riskPercent - a.risk.riskPercent;
+    });
+  } else {
+    dataSource.sort((a, b) => a.feature.localeCompare(b.feature, 'zh-CN'));
+  }
 
   const columns = [
     {
@@ -167,82 +189,88 @@ const FeatureTable = ({ features }) => {
       dataIndex: 'feature',
       key: 'feature',
       render: (text, record) => (
-        <Tooltip title={record.description}>
+        <Tooltip
+          title={
+            <div>
+              <div>{record.description}</div>
+              <div>{record.risk.directionHint}</div>
+            </div>
+          }
+        >
           <span>{text}</span>
         </Tooltip>
       )
     },
     {
-      title: '评分',
+      title: scoreView === 'raw' ? '评分（原始值）' : '评分（AI风险值）',
       dataIndex: 'score',
       key: 'score',
-      render: (text, record) => {
-        const { percent, strokeColor } = getFeatureScore(record.key, record.rawScore);
-        return <Progress percent={percent.toFixed(1)} strokeColor={strokeColor} />;
+      render: (_, record) => {
+        if (scoreView === 'risk') {
+          if (record.risk.isReference) {
+            return (
+              <Tooltip title="该特征是参考项，显示的是原始值，不参与高/中/低风险阈值判定。">
+                <Progress
+                  percent={Number(record.rawPercent.toFixed(1))}
+                  strokeColor="#91caff"
+                  format={(p) => `${Number(p).toFixed(1)}%（参考）`}
+                />
+              </Tooltip>
+            );
+          }
+          return (
+            <Progress
+              percent={Number(record.risk.riskPercent.toFixed(1))}
+              strokeColor={record.risk.strokeColor}
+              format={(p) => `${Number(p).toFixed(1)}%`}
+            />
+          );
+        }
+
+        return (
+          <Progress
+            percent={Number(record.rawPercent.toFixed(1))}
+            strokeColor="#1890ff"
+            format={(p) => `${Number(p).toFixed(1)}%`}
+          />
+        );
       }
     },
     {
-      title: 'AI指标',
+      title: 'AI指示',
       dataIndex: 'aiIndicator',
       key: 'aiIndicator',
-      width: 100,
-      render: (text, record) => {
-        // 根据得分动态计算AI指标，而不是使用静态预定义值
-        const dynamicIndicator = getDynamicAIIndicator(record.key, record.rawScore);
-        
-        // 更丰富的指标显示
-        switch(dynamicIndicator) {
-          case 'very_high':
-            return <span style={{ color: '#f5222d', fontWeight: 'bold' }}>极高</span>;
-          case 'high':
-            return <span className="danger-color">较高</span>;
-          case 'medium_high':
-            return <span style={{ color: '#fa8c16' }}>中高</span>;
-          case 'medium':
-            return <span className="primary-color">中等</span>;
-          case 'medium_neutral':
-            return <span style={{ color: '#1890ff' }}>中性</span>;
-          case 'medium_low':
-            return <span style={{ color: '#52c41a' }}>中低</span>;
-          case 'low':
-            return <span className="success-color">较低</span>;
-          default:
-            return <span className="primary-color">不确定</span>;
-        }
-      }
+      width: 180,
+      render: (_, record) => renderIndicator(record.risk)
     }
   ];
 
-  // 准备表格数据
-  const data = Object.keys(features || {}).map(key => {
-    // 确保features对象和key存在
-    if (!features || features[key] === undefined) {
-      return null;
-    }
-    
-    // 对于未知特征，提供默认信息
-    const featureData = featureInfo[key] || {
-      name: key,
-      description: '额外检测特征',
-      aiIndicator: 'varies'
-    };
-    
-    return {
-      key,
-      feature: featureData.name,
-      description: featureData.description,
-      rawScore: features[key],
-      aiIndicator: featureData.aiIndicator
-    };
-  }).filter(item => item !== null);
-
   return (
-    <Table
-      columns={columns}
-      dataSource={data}
-      pagination={false}
-      size="middle"
-    />
+    <>
+      <Space wrap style={{ marginBottom: 12 }}>
+        <span>评分视图</span>
+        <Segmented
+          size="small"
+          value={scoreView}
+          onChange={setScoreView}
+          options={[
+            { label: '原始值', value: 'raw' },
+            { label: 'AI风险值', value: 'risk' }
+          ]}
+        />
+        <span>特征排序</span>
+        <Segmented
+          size="small"
+          value={sortMode}
+          onChange={setSortMode}
+          options={[
+            { label: '风险优先', value: 'risk' },
+            { label: '名称顺序', value: 'name' }
+          ]}
+        />
+      </Space>
+      <Table columns={columns} dataSource={dataSource} pagination={false} size="middle" rowKey="key" />
+    </>
   );
 };
 
